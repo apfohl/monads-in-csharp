@@ -348,6 +348,35 @@ with the contained value
 
 ---
 
+# Bind() with LINQ
+
+^
+- Other names for Bind() are SelectMany() or FlatMap()
+^
+- Provide a special extension for Maybe<T>, implemented with Bind()
+^
+
+    public static Maybe<TResult> SelectMany<T, TCollection, TResult>(
+        this Maybe<T> maybe,
+        Func<T, Maybe<TCollection>> collection,
+        Func<T, TCollection, TResult> selector)
+^
+
+    var lightsaber =
+        from person in FindPerson("Luke Skywalker")
+        from lightsaber in FindLightSaber(person)
+        select lightsaber;
+^
+
+    Console.WriteLine(
+        lightsaber.Match(
+            lightsaber => lightsaber.Color,
+            () => "Lightsaber not found!"
+        )
+    )
+
+---
+
 # Maybe<T> inside
 
 ^
@@ -372,6 +401,39 @@ with the contained value
         public TResult Match<TResult>(Func<T, TResult> j, Func<TResult> n)
             => IsJust ? j(Instance) : n();
     }
+
+---
+
+# Other monads in C#
+
+\-> Hey Andreas, this looks constructed. Is there more?
+^
+
+\-> Of cause. That's the whole point of this talk ;).
+
+---
+
+# IEnumerable<T> ????????
+
+^
+- Context
+^
+- Immutable
+^
+- Easy in and hard out
+^
+- Methods
+  - Select()
+  - SelectMany() <- Bind()
+  - First()
+  - LINQ
+  - …
+
+---
+
+# Task<T> ???????
+
+- Implement Bind yourself
 
 ---
 
