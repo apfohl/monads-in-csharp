@@ -11,9 +11,9 @@
 
 ---
 
--> # Maybe<T> <-
+-> # Monads in C# <-
 
--> How to use monads in C# <-
+-> What is it and how can it be applied <-
 
 ---
 
