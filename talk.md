@@ -491,7 +491,7 @@ with the contained value
 # Lazy<T>
 
 ^
-    public static Lazy<T> LazyReturn<T>(this Func<T> factory) =>
+    public static Lazy<T> Return<T>(this Func<T> factory) =>
         new(factory);
 ^
 
@@ -522,7 +522,7 @@ with the contained value
 
     var factory = () => 42;
 ^
-    var lazy = factory.LazyReturn();
+    var lazy = factory.Return();
 ^
 
     var result = lazy.Bind(LazyApiCall);
@@ -535,6 +535,10 @@ with the contained value
 # Lazy<T> with LINQ
 
 ^
+    var factory = () => 42;
+    var lazy = factory.Return();
+^
+
     var result =
 ^
         from i in lazy
@@ -587,6 +591,7 @@ https://www.nuget.org/packages/Optional/
 
 -> # Thank you!
 
+## Slides: https://github.com/apfohl/monads-in-csharp
 
 ## References
 
