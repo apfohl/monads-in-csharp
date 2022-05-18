@@ -409,11 +409,11 @@ with the contained value
 \-> Hey Andreas, this looks constructed. Is there more?
 ^
 
-\-> Of cause. That's the whole point of this talk ;).
+\-> Of cause ;).
 
 ---
 
-# IEnumerable<T> ????????
+# IEnumerable<T>, IQueryable<T> and IObservable<T>
 
 ^
 - Context
@@ -431,9 +431,139 @@ with the contained value
 
 ---
 
-# Task<T> ???????
+# Task<T>
 
-- Implement Bind yourself
+^
+    public static Task<T> Return<T>(this T value) =>
+        Task.FromResult(value);
+^
+
+    public static async Task<TResult> Bind<T, TResult>(
+        this Task<T> task,
+        Func<T, Task<TResult>> func
+    ) => await func(await task);
+^
+
+    public static async Task<TResult> Map<T, TResult>(
+        this Task<T> task,
+        Func<T, TResult> func) =>
+        await func(await task).Return();
+
+---
+
+# Task<T> with Bind()
+
+^
+    var task = 42.Return();
+^
+    var result = await task.Bind(ApiCall);
+^    
+
+    Console.WriteLine(result);
+
+---
+
+# Task<T> with LINQ
+
+^
+    public static Task<TR> SelectMany<TS, TC, TR>(
+        this Task<TS> task,
+        Func<TS, Task<TC>> collectionSelector,
+        Func<TS, TC, TR> resultSelector) =>
+        task.Bind(
+            t => collectionSelector(t)
+                    .Map(r => resultSelector(t, r)));
+^
+
+    var result =
+^
+        from i in 42.Return()
+^
+        from j in ApiCall(i)
+^
+        select j;
+^
+
+    Console.WriteLine(await result);
+
+---
+
+# Lazy<T>
+
+^
+    public static Lazy<T> LazyReturn<T>(this Func<T> factory) =>
+        new(factory);
+^
+
+    public static Lazy<TResult> Map<T, TResult>(
+        this Lazy<T> lazy,
+        Func<T, TResult> func) =>
+        new(() => func(lazy.Value));
+^
+
+    public static Lazy<TResult> Bind<T, TResult>(
+        this Lazy<T> lazy,
+        Func<T, Lazy<TResult>> func) =>
+        lazy.Map(l => func(l).Value);
+
+---
+
+# Lazy<T> with Bind()
+
+^
+    public static Lazy<TR> SelectMany<TS, TC, TR>(
+        this Lazy<TS> lazy,
+        Func<TS, Lazy<TC>> collectionSelector,
+        Func<TS, TC, TR> resultSelector) =>
+        lazy.Bind(
+            t => collectionSelector(t)
+                    .Map(r => resultSelector(t, r)));
+^
+
+    var factory = () => 42;
+^
+    var lazy = factory.LazyReturn();
+^
+
+    var result = lazy.Bind(LazyApiCall);
+^
+
+    Console.WriteLine(result.Value);
+
+---
+
+# Lazy<T> with LINQ
+
+^
+    var result =
+^
+        from i in lazy
+^
+        from j in LazyApiCall(i)
+^
+        select j;
+^
+
+    Console.WriteLine(result.Value);
+
+---
+
+# Many, many possible monads
+
+^
+- Applicable for almost any generic type
+^
+- Same concept for all cases
+^
+- Abstraction of APIs
+^
+- Speaking and honest function prototypes
+^
+- If concept is understood, code and APIs become more clear
+and easier to read
+^
+
+\-> Give it a try!
 
 ---
 
